@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -44,14 +46,64 @@ namespace SimpleCalculatorGroup2
             lastStringValue += content;
             leftValue = temp;
         }
+
+        private void ButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
-    enum Operation
+    public enum Operation
     {
         Unknown = 0,
         Plus,
         Minus,
         Multiply,
         Divide,
+    }
+
+    public static class Extensions
+    {
+        public static string GetName (this Operation enumValue)
+        {
+            return enumValue.GetType()
+                            .GetMember(enumValue.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>().Name;
+        }
+
+        public static TAttribute GetAttribute<TAttribute>(this Operation enumValue)
+                where TAttribute : Attribute
+        {
+            return enumValue.GetType()
+                            .GetMember(enumValue.ToString())
+                            .First()
+                            .GetCustomAttribute<TAttribute>();
+        }
+
+        public static Operation GetValueFromName(string name)
+        {
+            var type = typeof(Operation);
+            if (!type.IsEnum) throw new InvalidOperationException();
+
+            foreach (var field in type.GetFields())
+            {
+                var attribute = Attribute.GetCustomAttribute(field,
+                    typeof(DisplayAttribute)) as DisplayAttribute;
+                if (attribute != null)
+                {
+                    if (attribute.Name == name)
+                    {
+                        return (Operation)field.GetValue(null);
+                    }
+                }
+                else
+                {
+                    if (field.Name == name)
+                        return (Operation)field.GetValue(null);
+                }
+            }
+            return Operation.Unknown;
+        }
     }
 }

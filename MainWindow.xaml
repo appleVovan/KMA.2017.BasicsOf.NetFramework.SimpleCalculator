@@ -17,16 +17,22 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBox Grid.ColumnSpan ="4" Margin =" 10" FontSize="20" FontWeight="Bold"></TextBox>
-        <Button Name ="Button1" Content ="1" Grid.Row ="2" Grid.Column="0" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button2" Content ="2" Grid.Row ="2" Grid.Column="1" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button3" Content ="3" Grid.Row ="2" Grid.Column="2" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button4" Content ="4" Grid.Row ="3" Grid.Column="0" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button5" Content ="5" Grid.Row ="3" Grid.Column="1" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button6" Content ="6" Grid.Row ="3" Grid.Column="2" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button7" Content ="7" Grid.Row ="4" Grid.Column="0" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button8" Content ="8" Grid.Row ="4" Grid.Column="1" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button9" Content ="9" Grid.Row ="4" Grid.Column="2" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-        <Button Name ="Button0" Content ="0" Grid.Row ="5" Grid.Column="1" Margin ="10" Click="Button1_Click" FontSize="20" FontWeight="Bold"/>
-    </Grid>
+        <TextBox Margin="10" Grid.ColumnSpan="4" FontSize="20"  Name="Box"/>
+        <Button Name="Button1" Grid.Row="2" Grid.Column="0" Margin="10" Content="1" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button2" Grid.Row="2" Grid.Column="1" Margin="10" Content="2" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button3" Grid.Row="2" Grid.Column="2" Margin="10" Content="3" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button4" Grid.Row="3" Grid.Column="0" Margin="10" Content="4" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button5" Grid.Row="3" Grid.Column="1" Margin="10" Content="5" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button6" Grid.Row="3" Grid.Column="2" Margin="10" Content="6" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button7" Grid.Row="4" Grid.Column="0" Margin="10" Content="7" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button8" Grid.Row="4" Grid.Column="1" Margin="10" Content="8" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button9" Grid.Row="4" Grid.Column="2" Margin="10" Content="9" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="Button0" Grid.Row="5" Grid.Column="1" Margin="10" Content="0" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonDot" Grid.Row="5" Grid.Column="0" Margin="10" Content="." Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonEqual" Grid.Row="5" Grid.Column="2" Margin="10" Content="=" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonPlus" Grid.Row="2" Grid.Column="3" Margin="10" Content="+" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonMinus" Grid.Row="3" Grid.Column="3" Margin="10" Content="-" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonMult" Grid.Row="4" Grid.Column="3" Margin="10" Content="*" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonDiv" Grid.Row="5" Grid.Column="3" Margin="10" Content="/" Click="Button1_Click" FontSize="20" FontWeight="Bold"></Button>
+        <Button Name="ButtonClear" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="10" Content="Clear" FontSize="20" FontWeight="Bold" Click="ButtonClear_Click"></Button>    </Grid>
 </Window>
