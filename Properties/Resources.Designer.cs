@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleCalculatorGroup2.Properties {
+namespace SimpleCalculatorGroup2.Properties
+{
     using System;
     
     
@@ -61,11 +62,20 @@ namespace SimpleCalculatorGroup2.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Forbidden operation. Trying to divide by zero..
+        ///   Looks up a localized string similar to Something went wrong. {0}Message: {1}..
         /// </summary>
-        internal static string Exception_ZeroDivision {
+        internal static string Exception_Default {
             get {
-                return ResourceManager.GetString("Exception_ZeroDivision", resourceCulture);
+                return ResourceManager.GetString("Exception_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forbidden operation. Trying to divide by 0.
+        /// </summary>
+        internal static string Exception_DivideByZero {
+            get {
+                return ResourceManager.GetString("Exception_DivideByZero", resourceCulture);
             }
         }
     }

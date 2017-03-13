@@ -1,119 +1,143 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SimpleCalculatorGroup2
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private string lastStringValue = "";
-        private double rightValue, leftValue;
-        private Operation operation;
         public MainWindow()
         {
             InitializeComponent();
-            Thread.CurrentThread.CurrentCulture=new CultureInfo("ru-Ru");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("ru-Ru");
-
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("uk-UA");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("uk-UA");
+            PrintValue();
         }
 
-        private void Button1_Click(object sender, RoutedEventArgs e)
+        private String _currentStringValue = "0";
+        private double _rightNumber = 0;
+        private double _leftNumber = 0;
+        Operation _operation = 0;
+
+        private void ButtonDigit_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var pressedButton = sender as Button;
-                if (pressedButton == null)
+                string content;
+                if (!CheckButton(sender, out content))
                     return;
-                var content = (string)pressedButton.Content;
-                if (String.IsNullOrWhiteSpace(content) || content.Length != 1)
+                var symbol = content[0];
+                
+                if (!Char.IsDigit(symbol) && (symbol != '.' || (symbol == '.' && _currentStringValue.Contains('.'))))
                     return;
-                char symbol = content[0];
-                if (Char.IsDigit(symbol))
-                {
-                    String tempValue = lastStringValue + symbol;
-                    double tempNumber = 0;
-                    if (Double.TryParse(tempValue, out tempNumber))
-                    {
-                        lastStringValue += symbol;
-                    }
-                    else return;
 
-                    if (operation == Operation.Unknown)
-                    {
-                        leftValue = tempNumber;
-                    }
-                    else rightValue = tempNumber;
-                }
+                string tempValue = _currentStringValue + symbol;
+                double tempNumber = 0;
+
+                if (!Double.TryParse(tempValue, NumberStyles.Any, CultureInfo.CreateSpecificCulture("en-US"),out tempNumber))
+                    return;
+
+                if (_operation == Operation.Unknown)
+                    _leftNumber = tempNumber;
                 else
-                {
-                    Operation tempOperation = Extensions.GetValueFromName(content);
-                    if (tempOperation == Operation.Unknown)
-                        return;
-                    if (tempOperation == Operation.Equal)
-                    {
-                        if (operation == Operation.Unknown)
-                            return;
-                        switch (operation)
-                        {
-                            case Operation.Plus:
-                                leftValue += rightValue;
-                                break;
-                            case Operation.Minus:
-                                leftValue -= rightValue;
-                                break;
-                            case Operation.Multiply:
-                                leftValue *= rightValue;
-                                break;
-                            case Operation.Divide:
-                                if (rightValue == 0) throw new Exception(Properties.Resources.Exception_ZeroDivision);
+                    _rightNumber = tempNumber;
 
-                                leftValue /= rightValue;
-                                break;
-                            default:
-                                return;
-                        }
-                        rightValue = 0;
-                        operation = Operation.Unknown;
-                    }
-                    else
-                    {
-                        operation = tempOperation;
-                        lastStringValue = "";
-                        
-                    }
-                }
-                Box.Text = operation == Operation.Unknown ? leftValue.ToString() : leftValue + operation.GetName() + rightValue;
+                _currentStringValue = tempValue;
+
+                PrintValue();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(String.Format(Properties.Resources.Exception_Default, Environment.NewLine, ex.Message));
             }
+        }
+        private void ButtonSymbol_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string content;
+                if (!CheckButton(sender, out content))
+                    return;
+                Operation tempOperation = Extensions.GetValueFromName(content);
+                if (tempOperation == Operation.Unknown)
+                    return;
+
+                if (tempOperation == Operation.Equal)
+                {
+                    if (_operation == Operation.Unknown)
+                        return;
+                    Calculate();
+                }
+                else
+                {
+                    if (_operation!=Operation.Unknown && _rightNumber!=0)
+                        return;
+                    _operation = tempOperation;
+                    _currentStringValue = "0";
+                }
+
+                PrintValue();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(String.Format(Properties.Resources.Exception_Default, Environment.NewLine, ex.Message));
+            }
+        }
+        private void Calculate()
+        {
+            switch (_operation)
+            {
+                case Operation.Plus:
+                    _leftNumber += _rightNumber;
+                    break;
+                case Operation.Minus:
+                    _leftNumber -= _rightNumber;
+                    break;
+                case Operation.Multiply:
+                    _leftNumber *= _rightNumber;
+                    break;
+                case Operation.Divide:
+                    if (_rightNumber == 0)
+                    {
+                        throw new Exception(Properties.Resources.Exception_DivideByZero);
+                    }
+                    _leftNumber /= _rightNumber;
+                    break;
+            }
+            _rightNumber = 0;
+            _currentStringValue = _leftNumber.ToString();
+            _operation = Operation.Unknown;
+        }
+        private void PrintValue()
+        {
+            Box.Text = _operation == Operation.Unknown
+                    ? _leftNumber.ToString()
+                    : _leftNumber + _operation.Name() + _rightNumber;
+        }
+
+        private bool CheckButton(object sender, out string content)
+        {
+            content = null;
+            var pressedButton = sender as Button;
+            if (pressedButton == null)
+                return false;
+            content = (string)pressedButton.Content;
+            return !String.IsNullOrWhiteSpace(content) && content.Length == 1;
         }
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
-            leftValue = rightValue = 0;
-            lastStringValue = "";
-            operation = Operation.Unknown;
-            Box.Text = "";
+            _rightNumber = _leftNumber = 0;
+            _operation = Operation.Unknown;
+            Box.Clear();
         }
     }
 
@@ -130,15 +154,18 @@ namespace SimpleCalculatorGroup2
         Divide,
         [Display(Name = "=")]
         Equal,
+        [Display(Name = "(")]
+        LeftParenthesis,
+        [Display(Name = ")")]
+        RightParenthesis,
     }
 
     public static class Extensions
     {
-        public static string GetName (this Operation enumValue)
+        public static string Name(this Operation enumValue)
         {
             return enumValue.GetAttribute<DisplayAttribute>().Name;
         }
-
         public static TAttribute GetAttribute<TAttribute>(this Operation enumValue)
                 where TAttribute : Attribute
         {
@@ -173,4 +200,5 @@ namespace SimpleCalculatorGroup2
             return Operation.Unknown;
         }
     }
+
 }

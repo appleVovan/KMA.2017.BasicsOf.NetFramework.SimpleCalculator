@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_ZeroDivision" xml:space="preserve">
-    <value>Forbidden operation. Trying to divide by zero.</value>
+  <data name="Exception_Default" xml:space="preserve">
+    <value>Something went wrong. {0}Message: {1}.</value>
+  </data>
+  <data name="Exception_DivideByZero" xml:space="preserve">
+    <value>Forbidden operation. Trying to divide by 0</value>
   </data>
 </root>

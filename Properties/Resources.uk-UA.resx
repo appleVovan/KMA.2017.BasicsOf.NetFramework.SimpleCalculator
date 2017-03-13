@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception_ZeroDivision" xml:space="preserve">
-    <value>Заборонена операція. Спроба ділення на нуль.</value>
+  <data name="Exception_Default" xml:space="preserve">
+    <value>Щось пішло не так. {0}Повідомлення: {1}.</value>
+  </data>
+  <data name="Exception_DivideByZero" xml:space="preserve">
+    <value>Заборонена операція. Спроба розділити на 0</value>
   </data>
 </root>
