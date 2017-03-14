@@ -54,6 +54,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Enums.cs" />
+    <Compile Include="Token\IToken.cs" />
+    <Compile Include="Token\OperationToken.cs" />
+    <Compile Include="Token\NumberToken.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
