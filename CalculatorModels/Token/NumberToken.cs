@@ -1,6 +1,6 @@
-﻿namespace SimpleCalculatorGroup2.Token
+﻿namespace Learning.Calculator.Models.Token
 {
-    class NumberToken: IToken
+    public class NumberToken: IToken
     {
         public NumberToken(double value)
         {

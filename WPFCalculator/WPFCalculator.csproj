@@ -7,8 +7,8 @@
     <ProjectGuid>{B2FC434F-07AC-4218-804C-2C958ED189E1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleCalculatorGroup2</RootNamespace>
-    <AssemblyName>SimpleCalculatorGroup2</AssemblyName>
+    <RootNamespace>Learning.Calculator.WPFCalculator</RootNamespace>
+    <AssemblyName>WPFCalculator</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -54,10 +54,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Enums.cs" />
-    <Compile Include="Token\IToken.cs" />
-    <Compile Include="Token\OperationToken.cs" />
-    <Compile Include="Token\NumberToken.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -98,6 +94,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CalculatorModels\CalculatorModels.csproj">
+      <Project>{C4321ED1-9B1B-4838-9A05-CD9F6F4F208C}</Project>
+      <Name>CalculatorModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

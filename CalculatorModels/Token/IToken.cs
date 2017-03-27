@@ -1,12 +1,12 @@
-﻿namespace SimpleCalculatorGroup2.Token
+﻿namespace Learning.Calculator.Models.Token
 {
-    enum TokenType
+    public enum TokenType
     {
         NumberToken,
         OperationToken,
     }
 
-    interface IToken
+    public interface IToken
     {
         string StringValue { get;}
         TokenType Type { get;}

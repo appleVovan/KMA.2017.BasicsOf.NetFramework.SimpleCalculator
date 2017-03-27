@@ -1,6 +1,6 @@
-﻿namespace SimpleCalculatorGroup2.Token
+﻿namespace Learning.Calculator.Models.Token
 {
-    class OperationToken: IToken
+    public class OperationToken: IToken
     {
         public OperationToken(Operation value)
         {

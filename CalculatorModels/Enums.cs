@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
-namespace SimpleCalculatorGroup2
+namespace Learning.Calculator.Models
 {
     public enum Operation
     {

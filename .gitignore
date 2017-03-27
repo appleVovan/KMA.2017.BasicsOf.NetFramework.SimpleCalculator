@@ -48,3 +48,9 @@ Temporary Items
 *.suo
 bin/
 obj/
+CalculatorModels/bin/
+CalculatorModels/obj/
+CalculatorViewModel/bin/
+CalculatorViewModel/obj/
+WPFCalculator/bin/
+WPFCalculator/obj/

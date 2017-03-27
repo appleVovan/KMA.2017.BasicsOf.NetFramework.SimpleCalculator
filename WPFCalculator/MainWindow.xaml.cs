@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using SimpleCalculatorGroup2.Token;
+using Learning.Calculator.Models;
+using Learning.Calculator.Models.Token;
 
-namespace SimpleCalculatorGroup2
+namespace Learning.Calculator.WPFCalculator
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -86,8 +84,14 @@ namespace SimpleCalculatorGroup2
 
                 if (tempOperation == Operation.Equal)
                 {
-                    if (_operation == Operation.Unknown)
-                        return;
+                    var lastOperation = _tokens.LastOrDefault() as OperationToken;
+                    if (lastOperation == null || lastOperation.Value == Operation.LeftParenthesis)
+                        throw new Exception();
+
+                    if (lastOperation.Value != Operation.RightParenthesis)
+                        _tokens.Add(new NumberToken(_currentValue));
+
+                        
                     Calculate();
                 }
                 else
@@ -131,9 +135,13 @@ namespace SimpleCalculatorGroup2
                 {
                     case Operation.Plus:
                     case Operation.Minus:
-                        if(operationStack.Any())
-                            outputQueue.Enqueue(operationStack.Pop());
-                        operationStack.Push(operationToken);
+                        if (operationStack.Any())
+                        {
+                            lastOperation = operationStack.Peek();
+                            if(lastOperation.Value != Operation.LeftParenthesis)
+                                outputQueue.Enqueue(operationStack.Pop());
+                        }
+                            operationStack.Push(operationToken);
                         break;
                     case Operation.Multiply:
                     case Operation.Divide:
@@ -164,10 +172,11 @@ namespace SimpleCalculatorGroup2
                         throw new ArgumentOutOfRangeException();
                 }
 
-                while (operationStack.Any())
-                {
-                    outputQueue.Enqueue(operationStack.Pop());
-                }
+                
+            }
+            while (operationStack.Any())
+            {
+                outputQueue.Enqueue(operationStack.Pop());
             }
 
             Stack<NumberToken> numberStack = new Stack<NumberToken>();
@@ -187,30 +196,36 @@ namespace SimpleCalculatorGroup2
                     throw new Exception();
                 var val2 = numberStack.Pop();
                 var val1 = numberStack.Pop();
-                switch (_operation)
+                switch (currentOperation.Value)
                 {
                     case Operation.Plus:
-                        _leftNumber += _rightNumber;
+                        numberStack.Push(val1 + val2);
                         break;
                     case Operation.Minus:
-                        _leftNumber -= _rightNumber;
+                        numberStack.Push(val1 - val2);
                         break;
                     case Operation.Multiply:
-                        _leftNumber *= _rightNumber;
+                        numberStack.Push(val1 * val2);
                         break;
                     case Operation.Divide:
-                        if (_rightNumber == 0)
+                        if (val2.Value == 0)
                         {
                             throw new Exception(Properties.Resources.Exception_DivideByZero);
                         }
-                        _leftNumber /= _rightNumber;
+                        numberStack.Push(val1 / val2);
                         break;
                 }
             }
 
-            _rightNumber = 0;
-            _currentStringValue = _leftNumber.ToString();
-            _operation = Operation.Unknown;
+            if (numberStack.Count != 1)
+            {
+                throw new Exception();
+            }
+            
+            ClearData();
+            _currentValue = numberStack.Pop().Value;
+            _currentStringValue = _currentValue.ToString();
+            PrintValue();
         }
         private void PrintValue()
         {
@@ -237,10 +252,15 @@ namespace SimpleCalculatorGroup2
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
+            ClearData();
+            PrintValue();
+        }
+
+        private void ClearData()
+        {
             _tokens.Clear();
             _currentValue = 0;
             _currentStringValue = "0";
-            PrintValue();
         }
     }
 
