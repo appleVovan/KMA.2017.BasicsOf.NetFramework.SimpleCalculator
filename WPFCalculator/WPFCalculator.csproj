@@ -71,21 +71,21 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Include="Properties\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Include="Properties\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.uk-UA.resx" />
+    <EmbeddedResource Include="Properties\Strings.uk-UA.resx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -96,9 +96,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CalculatorModels\CalculatorModels.csproj">
-      <Project>{C4321ED1-9B1B-4838-9A05-CD9F6F4F208C}</Project>
-      <Name>CalculatorModels</Name>
+    <ProjectReference Include="..\CalculatorViewModel\CalculatorViewModels.csproj">
+      <Project>{A72B0DAC-A50E-4C0D-944B-D349A185562B}</Project>
+      <Name>CalculatorViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logger\Logger.csproj">
+      <Project>{6693F00F-2C6F-4E71-B185-29662911149F}</Project>
+      <Name>Logger</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

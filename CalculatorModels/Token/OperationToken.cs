@@ -1,25 +1,59 @@
-﻿namespace Learning.Calculator.Models.Token
+﻿using System;
+using System.Data.Entity.ModelConfiguration;
+using System.Runtime.Serialization;
+
+namespace Learning.Calculator.Models.Token
 {
-    public class OperationToken: IToken
+    [DataContract]
+    [Serializable]
+    public class OperationToken : Token
     {
-        public OperationToken(Operation value)
+        #region Properties
+
+        [DataMember]
+        public Operation Value { get; private set; }
+
+        #region Override
+
+        public override TokenType Type
         {
-            Value = value;
+            get { return TokenType.OperationToken; }
         }
 
-        public string StringValue
+        protected internal override string StringValue
         {
             get { return Value.Name(); }
         }
 
-        public TokenType Type
+        #endregion
+
+        #endregion
+
+        #region Construcotrs
+
+        internal OperationToken(Operation value, Guid modelGuid, int index) : base(modelGuid, index)
         {
-            get
+            Value = value;
+        }
+
+        private OperationToken()
+        {
+        }
+
+        #endregion
+
+        #region EntityFrameworkConfiguration
+
+        public class OperationTokenConfiguration : EntityTypeConfiguration<OperationToken>
+        {
+            public OperationTokenConfiguration()
             {
-                return TokenType.OperationToken;
+                ToTable("OperationToken");
+                HasKey(t => t.Guid);
+                Property(t => t.Value).HasColumnName("Value").IsRequired();
             }
         }
 
-        public Operation Value { get; private set; }
+        #endregion
     }
 }

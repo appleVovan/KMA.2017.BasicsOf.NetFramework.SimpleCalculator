@@ -1,29 +1,123 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.ModelConfiguration;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using Learning.Calculator.Models.Token;
 
 namespace Learning.Calculator.Models
 {
+    [DataContract]
+    [Serializable]
     public class CalculatorModel
     {
-        private readonly List<IToken> _tokens = new List<IToken>();
-        private double _currentValue;
-        private String _currentStringValue = "0";
+        #region Fields
 
-        public bool IsPrinted
+        public int Index = 0;
+        [DataMember] private Guid _id;
+        [DataMember] private List<Token.Token> _tokens = new List<Token.Token>();
+        [DataMember] private double _currentValue;
+        [DataMember] private string _resultValue;
+        [DataMember] private String _currentStringValue = "0";
+        private string _tokenView;
+
+        #endregion
+
+        #region Properties
+
+        public Guid Id
+        {
+            get { return _id; }
+            private set { _id = value; }
+        }
+
+        public double CurrentValue
+        {
+            get { return _currentValue; }
+            private set { _currentValue = value; }
+        }
+
+        private string CurrentStringValue
+        {
+            get { return _currentStringValue; }
+            set { _currentStringValue = value; }
+        }
+
+        public string ResultValue
+        {
+            get { return _resultValue; }
+            set { _resultValue = value; }
+        }
+
+        #region Dynamic
+
+        public string TokenView
+        {
+            get
+            {
+                if (String.IsNullOrWhiteSpace(_tokenView))
+                {
+                    _tokenView = ToString();
+                }
+                return _tokenView;
+            }
+        }
+
+        private bool IsPrinted
         {
             get
             {
                 var lastToken = _tokens.LastOrDefault() as OperationToken;
                 if (lastToken == null)
-                    return true;
+                {
+                    return (_tokens.LastOrDefault() as NumberToken) == null;
+                }
                 return lastToken.Value != Operation.RightParenthesis;
             }
         }
 
-        private void AddDigit(string content)
+        #endregion
+
+        #region Associations
+
+        public virtual List<Token.Token> Tokens
+        {
+            get { return _tokens; }
+            set { _tokens = value; }
+        }
+        
+        #endregion
+
+        #endregion
+
+        #region Constructors
+
+        public CalculatorModel()
+        {
+            _id = Guid.NewGuid();
+        }
+
+        #endregion
+
+        #region Methods
+        
+        public void UpdateValue(double value)
+        {
+            ClearData(value);
+        }
+
+        public void ClearData(double value = 0)
+        {
+            _tokens.Clear();
+            _currentValue = value;
+            _currentStringValue = value.ToString();
+        }
+
+        public void AddDigit(string content)
         {
             var symbol = content[0];
 
@@ -33,168 +127,129 @@ namespace Learning.Calculator.Models
             string tempValue = _currentStringValue + symbol;
             double tempNumber = 0;
 
-            if (
-                !Double.TryParse(tempValue, NumberStyles.Any, CultureInfo.CreateSpecificCulture("en-US"), out tempNumber))
+            if (!Double.TryParse(tempValue, NumberStyles.Any, CultureInfo.CreateSpecificCulture("en-US"), out tempNumber))
                 return;
 
             _currentValue = tempNumber;
-
             _currentStringValue = tempValue;
-
         }
 
-        private void AddSymbol(string content)
+        public void AddSymbol(string content)
         {
             Operation tempOperation = Extensions.GetValueFromName(content);
-            if (tempOperation == Operation.Unknown)
+            if (tempOperation == Operation.Unknown || tempOperation == Operation.Equal)
                 return;
 
-            if (tempOperation == Operation.Equal)
-            {
-                var lastOperation = _tokens.LastOrDefault() as OperationToken;
-                if (lastOperation == null || lastOperation.Value == Operation.LeftParenthesis)
-                    throw new Exception();
+            var lastOperation = _tokens.LastOrDefault() as OperationToken;
 
-                if (lastOperation.Value != Operation.RightParenthesis)
-                    _tokens.Add(new NumberToken(_currentValue));
-
-
-                Calculate();
-            }
-            else
-            {
-                var lastOperation = _tokens.LastOrDefault() as OperationToken;
-
-                if (tempOperation != Operation.LeftParenthesis &&
-                    (lastOperation == null || lastOperation.Value != Operation.RightParenthesis))
-                    _tokens.Add(new NumberToken(_currentValue));
-                _tokens.Add(new OperationToken(tempOperation));
-                if (tempOperation != Operation.LeftParenthesis)
-                {
-                    _currentValue = 0;
-                    _currentStringValue = "0";
-                }
-            }
-
-        }
-
-        private void Calculate()
-        {
-            var operationStack = new Stack<OperationToken>();
-            var outputQueue = new Queue<IToken>();
-
-            foreach (var token in _tokens)
-            {
-                if (token.Type == TokenType.NumberToken)
-                {
-                    outputQueue.Enqueue(token);
-                    continue;
-                }
-                var operationToken = token as OperationToken;
-                if (operationToken == null)
-                    throw new Exception();
-                OperationToken lastOperation;
-                switch (operationToken.Value)
-                {
-                    case Operation.Plus:
-                    case Operation.Minus:
-                        if (operationStack.Any())
-                        {
-                            lastOperation = operationStack.Peek();
-                            if (lastOperation.Value != Operation.LeftParenthesis)
-                                outputQueue.Enqueue(operationStack.Pop());
-                        }
-                        operationStack.Push(operationToken);
-                        break;
-                    case Operation.Multiply:
-                    case Operation.Divide:
-                        if (operationStack.Any())
-                        {
-                            lastOperation = operationStack.Peek();
-                            if (lastOperation.Value == Operation.Multiply || lastOperation.Value == Operation.Divide)
-                                outputQueue.Enqueue(operationStack.Pop());
-                        }
-                        operationStack.Push(operationToken);
-                        break;
-                    case Operation.LeftParenthesis:
-                        operationStack.Push(operationToken);
-                        break;
-                    case Operation.RightParenthesis:
-                        lastOperation = null;
-                        while (operationStack.Any())
-                        {
-                            lastOperation = operationStack.Pop();
-                            if (lastOperation.Value == Operation.LeftParenthesis)
-                                break;
-                            outputQueue.Enqueue(lastOperation);
-                        }
-                        if (lastOperation == null || lastOperation.Value != Operation.LeftParenthesis)
-                            throw new Exception();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-
-            }
-            while (operationStack.Any())
-            {
-                outputQueue.Enqueue(operationStack.Pop());
-            }
-
-            var numberStack = new Stack<NumberToken>();
-
-            while (outputQueue.Any())
-            {
-                IToken currentToken = outputQueue.Dequeue();
-                if (currentToken.Type == TokenType.NumberToken)
-                {
-                    numberStack.Push(currentToken as NumberToken);
-                    continue;
-                }
-                var currentOperation = currentToken as OperationToken;
-                if (currentOperation == null)
-                    throw new Exception();
-                if (numberStack.Count < 2)
-                    throw new Exception();
-                var val2 = numberStack.Pop();
-                var val1 = numberStack.Pop();
-                switch (currentOperation.Value)
-                {
-                    case Operation.Plus:
-                        numberStack.Push(val1 + val2);
-                        break;
-                    case Operation.Minus:
-                        numberStack.Push(val1 - val2);
-                        break;
-                    case Operation.Multiply:
-                        numberStack.Push(val1*val2);
-                        break;
-                    case Operation.Divide:
-                        if (val2.Value == 0)
-                        {
-                            throw new Exception(Properties.Resources.Exception_DivideByZero);
-                        }
-                        numberStack.Push(val1/val2);
-                        break;
-                }
-            }
-
-            if (numberStack.Count != 1)
-            {
-                throw new Exception();
-            }
-
-            ClearData();
-            _currentValue = numberStack.Pop().Value;
-            _currentStringValue = _currentValue.ToString();
-        }
-
-        private void ClearData()
-        {
-            _tokens.Clear();
+            if (tempOperation != Operation.LeftParenthesis &&
+                (lastOperation == null || lastOperation.Value != Operation.RightParenthesis))
+                _tokens.Add(new NumberToken(_currentValue, Id, Index++));
+            _tokens.Add(new OperationToken(tempOperation, Id, Index++));
+            if (tempOperation == Operation.LeftParenthesis) 
+                return;
             _currentValue = 0;
             _currentStringValue = "0";
         }
+
+        #endregion
+
+        #region Override
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (var token in _tokens)
+            {
+                builder.AppendFormat("{0} ", token.StringValue);
+            }
+            if (IsPrinted)
+                builder.Append(_currentValue.ToString());
+            return builder.ToString();
+        }
+
+        #endregion
+
+        #region EntityFrameworkConfigurtion
+
+        public class CalculatorModelConfiguration : EntityTypeConfiguration<CalculatorModel>
+        {
+            public CalculatorModelConfiguration()
+            {
+                ToTable("CalculatorModel");
+                HasKey(t => t.Id);
+                Property(t => t.ResultValue).HasColumnName("ResultValue").IsRequired();
+                HasMany(t => t.Tokens)
+                    .WithRequired(t => t.Parent)
+                    .HasForeignKey(t => t.ModelGuid)
+                    .WillCascadeOnDelete(true);
+
+                Ignore(t => t.IsPrinted);
+                Ignore(t => t.CurrentValue);
+                Ignore(t => t.CurrentStringValue);
+                Ignore(t => t.TokenView);
+            }
+        }
+
+        #endregion
+
+        #region Serialization
+
+        public void Serialize(string path)
+        {
+            try
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                path = Path.Combine(path, "LastModel.calcm");
+                if (File.Exists(path))
+                    File.Delete(path);
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+                formatter.Serialize(stream, this);
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.Log(ex, "In Serialize");
+            }
+        }
+
+        public static CalculatorModel Deserialize(string path)
+        {
+            CalculatorModel obj = null;
+            try
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                path = Path.Combine(path, "LastModel.calcm");
+                Stream stream = null;
+                if (File.Exists(path))
+                {
+                    try
+                    {
+                        IFormatter formatter = new BinaryFormatter();
+                        stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        obj = (CalculatorModel) formatter.Deserialize(stream);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                    finally
+                    {
+                        if (stream != null)
+                            stream.Close();
+                    }
+                }
+            }
+            catch
+                (Exception ex)
+            {
+                Logger.Logger.Log(ex, "In Serialize");
+            }
+            return obj ?? new CalculatorModel();
+        }
+
+        #endregion
     }
 }
